@@ -16,20 +16,23 @@ body {
 
 @media (max-width: 768px) {
   .app-layout {
-    flex-direction: column;
-    height: auto;
-  }
-
-  .sidebar {
-    width: 100% !important;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 8px;
+    flex-direction: column !important;
+    height: 100vh;
+    overflow: hidden;
   }
 
   .main-content {
-    height: auto;
-    overflow: visible;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-content > div:first-child {
+    padding: 12px 16px !important;
+  }
+
+  .main-content > div:last-child {
+    padding: 16px !important;
   }
 }

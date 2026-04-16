@@ -29,8 +29,8 @@ function App() {
       case 'transactions': return <Transactions {...txData} />
       case 'analytics':    return <Analytics    {...txData} />
       case 'budget':       return <Budget       {...txData} />
-      case 'ai': return <AIAssistant {...txData} />
-      case 'settings': return <Settings />
+      case 'ai':           return <AIAssistant  {...txData} />
+      case 'settings':     return <Settings />
       default:
         return <p style={{ color: '#6b6b8a' }}>🚧 Coming soon.</p>
     }
@@ -47,14 +47,6 @@ function App() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-        }}>
-          <div style={{
-          padding: '20px 32px',
-          background: '#fff',
-          borderBottom: '1px solid #e0e0f0',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
           flexWrap: 'wrap',
           gap: '10px',
         }}>
@@ -62,7 +54,6 @@ function App() {
             {activePage}
           </h1>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            {/* Currency Switcher */}
             <select
               value={currency}
               onChange={e => changeCurrency(e.target.value)}
@@ -93,8 +84,7 @@ function App() {
             </button>
           </div>
         </div>
-        </div>
-        <div style={{ flex:1, overflowY:'auto', padding:'24px 32px' }}>
+        <div style={{ flex:1, overflowY:'auto', padding:'24px 32px', paddingBottom:'80px' }}>
           {renderPage()}
         </div>
       </div>

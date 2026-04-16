@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
+import { useCurrency } from '../CurrencyContext'
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
-// Suggested questions user can click
+
 const SUGGESTIONS = [
   '📊 Summarize my spending this month',
   '💡 Give me 3 tips to save more money',
@@ -12,6 +13,8 @@ const SUGGESTIONS = [
 ]
 
 function AIAssistant({ transactions, totalIncome, totalExpenses, savings, byCategory }) {
+  const { format, convert, currency } = useCurrency()
+
   const [apiKey, setApiKey]     = useState(() => localStorage.getItem('gemini_key') || '')
   const [keySaved, setKeySaved] = useState(() => !!localStorage.getItem('gemini_key'))
   const [messages, setMessages] = useState([
@@ -24,7 +27,6 @@ function AIAssistant({ transactions, totalIncome, totalExpenses, savings, byCate
   const [loading, setLoading] = useState(false)
   const bottomRef             = useRef(null)
 
-  // Auto scroll to bottom on new message
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
@@ -35,23 +37,23 @@ function AIAssistant({ transactions, totalIncome, totalExpenses, savings, byCate
     setKeySaved(true)
   }
 
-  // Build a summary of user's finances to send to AI
   function buildFinanceContext() {
     const categoryBreakdown = Object.entries(byCategory)
-      .map(([cat, amt]) => `  - ${cat}: $${amt.toFixed(2)}`)
+      .map(([cat, amt]) => `  - ${cat}: ${format(amt)}`)
       .join('\n')
 
     const recentTx = transactions.slice(0, 10)
-      .map(tx => `  - ${tx.date} | ${tx.description} | ${tx.type} | $${tx.amount} | ${tx.category}`)
+      .map(tx => `  - ${tx.date} | ${tx.description} | ${tx.type} | ${format(tx.amount)} | ${tx.category}`)
       .join('\n')
 
     return `
 You are a helpful personal finance assistant. Here is the user's financial data:
 
 SUMMARY:
-- Total Income:   $${totalIncome.toFixed(2)}
-- Total Expenses: $${totalExpenses.toFixed(2)}
-- Net Savings:    $${savings.toFixed(2)}
+- Currency: ${currency}
+- Total Income:   ${format(totalIncome)}
+- Total Expenses: ${format(totalExpenses)}
+- Net Savings:    ${format(savings)}
 - Savings Rate:   ${totalIncome > 0 ? ((savings / totalIncome) * 100).toFixed(1) : 0}%
 - Total Transactions: ${transactions.length}
 
@@ -63,6 +65,7 @@ ${recentTx || '  No transactions yet.'}
 
 Answer the user's question based on this data. Be friendly, concise, and helpful.
 Use emojis to make responses engaging. If the user asks for tips, give specific advice based on their actual data.
+Always use the ${currency} currency symbol when mentioning amounts.
     `.trim()
   }
 
@@ -71,7 +74,6 @@ Use emojis to make responses engaging. If the user asks for tips, give specific 
     if (!userText || loading) return
     if (!apiKey) return alert('Please enter your Gemini API key first.')
 
-    // Add user message
     setMessages(prev => [...prev, { role: 'user', text: userText }])
     setInput('')
     setLoading(true)
@@ -122,7 +124,6 @@ Use emojis to make responses engaging. If the user asks for tips, give specific 
   return (
     <div style={styles.container}>
 
-      {/* API KEY BANNER */}
       {!keySaved && (
         <div style={styles.keyBanner}>
           <p style={styles.keyTitle}>🔑 Enter your Gemini API Key to activate the AI</p>
@@ -144,10 +145,7 @@ Use emojis to make responses engaging. If the user asks for tips, give specific 
         </div>
       )}
 
-      {/* CHAT AREA */}
       <div style={styles.chatBox}>
-
-        {/* Messages */}
         <div style={styles.messages}>
           {messages.map((msg, i) => (
             <div
@@ -157,9 +155,7 @@ Use emojis to make responses engaging. If the user asks for tips, give specific 
                 justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
               }}
             >
-              {msg.role === 'ai' && (
-                <div style={styles.avatar}>🤖</div>
-              )}
+              {msg.role === 'ai' && <div style={styles.avatar}>🤖</div>}
               <div style={{
                 ...styles.bubble,
                 ...(msg.role === 'user' ? styles.bubbleUser : styles.bubbleAi),
@@ -171,13 +167,10 @@ Use emojis to make responses engaging. If the user asks for tips, give specific 
                   </span>
                 ))}
               </div>
-              {msg.role === 'user' && (
-                <div style={styles.avatar}>👤</div>
-              )}
+              {msg.role === 'user' && <div style={styles.avatar}>👤</div>}
             </div>
           ))}
 
-          {/* Typing indicator */}
           {loading && (
             <div style={{ ...styles.msgRow, justifyContent: 'flex-start' }}>
               <div style={styles.avatar}>🤖</div>
@@ -194,22 +187,16 @@ Use emojis to make responses engaging. If the user asks for tips, give specific 
           <div ref={bottomRef} />
         </div>
 
-        {/* Suggestions */}
         {messages.length <= 1 && (
           <div style={styles.suggestions}>
             {SUGGESTIONS.map((s, i) => (
-              <button
-                key={i}
-                style={styles.suggBtn}
-                onClick={() => sendMessage(s)}
-              >
+              <button key={i} style={styles.suggBtn} onClick={() => sendMessage(s)}>
                 {s}
               </button>
             ))}
           </div>
         )}
 
-        {/* Input Bar */}
         <div style={styles.inputBar}>
           <textarea
             style={styles.input}
@@ -230,9 +217,7 @@ Use emojis to make responses engaging. If the user asks for tips, give specific 
             ➤
           </button>
         </div>
-
       </div>
-
     </div>
   )
 }
@@ -399,7 +384,6 @@ const styles = {
   },
 }
 
-// Inject keyframe animation
 const styleTag = document.createElement('style')
 styleTag.innerHTML = dotAnim
 document.head.appendChild(styleTag)
