@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useCurrency } from '../CurrencyContext'
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 
 const SUGGESTIONS = [
   '📊 Summarize my spending this month',
@@ -15,8 +15,8 @@ const SUGGESTIONS = [
 function AIAssistant({ transactions, totalIncome, totalExpenses, savings, byCategory }) {
   const { format, convert, currency } = useCurrency()
 
-  const [apiKey, setApiKey]     = useState(() => localStorage.getItem('gemini_key') || '')
-  const [keySaved, setKeySaved] = useState(() => !!localStorage.getItem('gemini_key'))
+  const [apiKey, setApiKey]     = useState(() => localStorage.getItem('groq_key') || '')
+  const [keySaved, setKeySaved] = useState(() => !!localStorage.getItem('groq_key'))
   const [messages, setMessages] = useState([
     {
       role: 'ai',
@@ -33,7 +33,7 @@ function AIAssistant({ transactions, totalIncome, totalExpenses, savings, byCate
 
   function saveKey() {
     if (!apiKey.trim()) return
-    localStorage.setItem('gemini_key', apiKey.trim())
+    localStorage.setItem('groq_key', apiKey.trim())
     setKeySaved(true)
   }
 
@@ -72,24 +72,26 @@ Always use the ${currency} currency symbol when mentioning amounts.
   async function sendMessage(text) {
     const userText = text || input.trim()
     if (!userText || loading) return
-    if (!apiKey) return alert('Please enter your Gemini API key first.')
+    if (!apiKey) return alert('Please enter your Groq API key first.')
 
     setMessages(prev => [...prev, { role: 'user', text: userText }])
     setInput('')
     setLoading(true)
 
     try {
-      const res = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+      const res = await fetch(GROQ_API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { text: buildFinanceContext() + '\n\nUser question: ' + userText }
-              ]
-            }
-          ]
+          model: 'llama-3.1-8b-instant',
+          max_tokens: 1024,
+          messages: [
+            { role: 'system', content: buildFinanceContext() },
+            { role: 'user', content: userText },
+          ],
         })
       })
 
@@ -99,7 +101,7 @@ Always use the ${currency} currency symbol when mentioning amounts.
         throw new Error(data.error.message || 'API error')
       }
 
-      const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text
+      const aiText = data.choices?.[0]?.message?.content
         || 'Sorry, I could not generate a response. Please try again.'
 
       setMessages(prev => [...prev, { role: 'ai', text: aiText }])
@@ -126,12 +128,12 @@ Always use the ${currency} currency symbol when mentioning amounts.
 
       {!keySaved && (
         <div style={styles.keyBanner}>
-          <p style={styles.keyTitle}>🔑 Enter your Gemini API Key to activate the AI</p>
+          <p style={styles.keyTitle}>🔑 Enter your Groq API Key to activate the AI</p>
           <div style={styles.keyRow}>
             <input
               style={styles.keyInput}
               type="password"
-              placeholder="Paste your Gemini API key here..."
+              placeholder="Paste your Groq API key here (gsk_...)..."
               value={apiKey}
               onChange={e => setApiKey(e.target.value)}
             />
@@ -140,7 +142,10 @@ Always use the ${currency} currency symbol when mentioning amounts.
             </button>
           </div>
           <p style={styles.keyNote}>
-            🔒 Your key is saved only in your browser. Never shared anywhere.
+            🔒 Your key is saved only in your browser. Never shared anywhere.{' '}
+            <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer" style={{ color: '#7c6ff7' }}>
+              Get your free Groq key →
+            </a>
           </p>
         </div>
       )}
