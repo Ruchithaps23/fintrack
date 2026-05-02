@@ -1,4 +1,4 @@
-import { useCurrency } from './CurrencyContext' 
+import { useCurrency } from './CurrencyContext'
 import { useState } from 'react'
 import Sidebar from './components/Sidebar'
 import useTransactions from './data/useTransactions'
@@ -8,6 +8,7 @@ import Analytics from './pages/Analytics'
 import Budget from './pages/Budget'
 import AIAssistant from './pages/AIAssistant'
 import Settings from './pages/Settings'
+import InvestmentSuggester from './components/InvestmentSuggester'
 
 function App() {
   const { currency, changeCurrency, currencies } = useCurrency()
@@ -30,6 +31,7 @@ function App() {
       case 'analytics':    return <Analytics    {...txData} />
       case 'budget':       return <Budget       {...txData} />
       case 'ai':           return <AIAssistant  {...txData} />
+      case 'invest':       return <InvestmentSuggester totalIncome={txData.totalIncome} totalExpenses={txData.totalExpenses} />
       case 'settings':     return <Settings />
       default:
         return <p style={{ color: '#6b6b8a' }}>🚧 Coming soon.</p>
@@ -50,8 +52,8 @@ function App() {
           flexWrap: 'wrap',
           gap: '10px',
         }}>
-          <h1 style={{ fontSize:'22px', fontWeight:'800', textTransform:'capitalize' }}>
-            {activePage}
+          <h1 style={{ fontSize: '22px', fontWeight: '800', textTransform: 'capitalize' }}>
+            {activePage === 'invest' ? 'Investment Suggester' : activePage}
           </h1>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             <select
@@ -76,15 +78,15 @@ function App() {
               ))}
             </select>
             <button onClick={handleAddClick} style={{
-              background:'#7c6ff7', color:'#fff', border:'none',
-              padding:'10px 20px', borderRadius:'10px',
-              fontWeight:'600', cursor:'pointer', fontSize:'14px',
+              background: '#7c6ff7', color: '#fff', border: 'none',
+              padding: '10px 20px', borderRadius: '10px',
+              fontWeight: '600', cursor: 'pointer', fontSize: '14px',
             }}>
               + Add Transaction
             </button>
           </div>
         </div>
-        <div style={{ flex:1, overflowY:'auto', padding:'24px 32px', paddingBottom:'80px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 32px', paddingBottom: '80px' }}>
           {renderPage()}
         </div>
       </div>

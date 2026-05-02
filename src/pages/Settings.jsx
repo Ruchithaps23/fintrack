@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 function Settings() {
-  const [geminiKey, setGeminiKey] = useState(
-    () => localStorage.getItem('gemini_key') || ''
+  const [groqKey, setGroqKey] = useState(
+    () => localStorage.getItem('groq_key') || ''
   )
   const [saved, setSaved] = useState(false)
 
@@ -13,7 +13,7 @@ function Settings() {
   const budgets = localStorage.getItem('fintrack_budgets')
 
   function saveKey() {
-    localStorage.setItem('gemini_key', geminiKey.trim())
+    localStorage.setItem('groq_key', groqKey.trim())
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
@@ -53,7 +53,7 @@ function Settings() {
         <h2 style={styles.sectionTitle}>🤖 AI Assistant</h2>
         <div style={styles.row}>
           <div>
-            <p style={styles.rowLabel}>Gemini API Key</p>
+            <p style={styles.rowLabel}>Groq API Key</p>
             <p style={styles.rowDesc}>Used to power the AI Assistant chat</p>
           </div>
         </div>
@@ -61,9 +61,9 @@ function Settings() {
           <input
             style={styles.input}
             type="password"
-            placeholder="AIzaSy..."
-            value={geminiKey}
-            onChange={e => setGeminiKey(e.target.value)}
+            placeholder="gsk_..."
+            value={groqKey}
+            onChange={e => setGroqKey(e.target.value)}
           />
           <button style={styles.btnPrimary} onClick={saveKey}>
             {saved ? '✅ Saved!' : 'Save Key'}
@@ -113,9 +113,9 @@ function Settings() {
             ['App',        'FinTrack'],
             ['Version',    '1.0.0'],
             ['Built with', 'React + Vite'],
-            ['AI',         'Google Gemini'],
+            ['AI',         'Groq (LLaMA 3.1)'],
             ['Storage',    'Browser localStorage'],
-            ['Data Policy','Immutable — transactions are never deleted'],
+            ['Data Policy','All data stays in your browser'],
           ].map(([key, val]) => (
             <div key={key} style={styles.aboutRow}>
               <span style={styles.aboutKey}>{key}</span>

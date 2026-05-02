@@ -14,9 +14,26 @@ body {
 ::-webkit-scrollbar-track { background: #f0f2f5; }
 ::-webkit-scrollbar-thumb { background: #c0c0d0; border-radius: 3px; }
 
+/* Desktop: show sidebar, hide bottom nav */
+.desktop-sidebar {
+  display: flex !important;
+}
+.mobile-nav {
+  display: none !important;
+}
+
+/* Mobile: hide sidebar, show bottom nav */
 @media (max-width: 768px) {
+  .desktop-sidebar {
+    display: none !important;
+  }
+
+  .mobile-nav {
+    display: flex !important;
+  }
+
   .app-layout {
-    flex-direction: column !important;
+    flex-direction: row !important;
     height: 100vh;
     overflow: hidden;
   }

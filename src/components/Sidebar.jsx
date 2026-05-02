@@ -1,4 +1,4 @@
-import { LayoutDashboard, ArrowLeftRight, BarChart2, Target, Bot, Settings } from 'lucide-react'
+import { LayoutDashboard, ArrowLeftRight, BarChart2, Target, Bot, Settings, TrendingUp } from 'lucide-react'
 
 const navItems = [
   { id: 'dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
@@ -6,6 +6,7 @@ const navItems = [
   { id: 'analytics',    label: 'Analytics',    icon: BarChart2 },
   { id: 'budget',       label: 'Budget',       icon: Target },
   { id: 'ai',           label: 'AI Assistant', icon: Bot },
+  { id: 'invest',       label: 'Invest',       icon: TrendingUp },
   { id: 'settings',     label: 'Settings',     icon: Settings },
 ]
 
